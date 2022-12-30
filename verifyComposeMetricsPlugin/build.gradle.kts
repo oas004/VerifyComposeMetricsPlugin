@@ -26,7 +26,7 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        plugins.register("verify-compose-metrics") {
+        plugins.create("verify-compose-metrics") {
             id = "com.metrics.verify.compose.metrics"
             implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
         }

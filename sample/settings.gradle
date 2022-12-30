@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        maven {
+            url = uri("../verifyComposeMetricsPlugin/")
+        }
+        mavenLocal()
+        gradlePluginPortal()
+    }
+
+    includeBuild("../verifyComposeMetricsPlugin")
+}
+rootProject.name = "VerifyComposeMetricsSample"
+include ':app'

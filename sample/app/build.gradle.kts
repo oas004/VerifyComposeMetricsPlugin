@@ -1,9 +1,7 @@
-import com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.metrics.verify.compose.metrics")
+    id("com.metrics.verify.compose.metrics") version "1.0-SNAPSHOT"
 }
 
 android {

@@ -42,12 +42,6 @@ android {
     }
 }
 
-sourceSets {
-    create("funcTest") {
-        this.java.srcDir("src/funcTest/java")
-    }
-}
-
 VerifyComposeMetricsConfig {
     inferredUnstableClassThreshold = 0
     errorAsWarning = false

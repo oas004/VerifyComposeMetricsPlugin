@@ -8,7 +8,7 @@ import org.gradle.api.GradleException
  * Should be thrown when the compose metrics verification exceeds the set threshold.
  *
  */
-abstract class ComposeMetricsThresholdException: GradleException()
+public abstract class ComposeMetricsThresholdException: GradleException()
 
 /**
  * InferredUnstableClassException
@@ -20,7 +20,7 @@ abstract class ComposeMetricsThresholdException: GradleException()
  * @property inferredUnstableClasses
  * @property possiblePlaces
  */
-class InferredUnstableClassException(
+public class InferredUnstableClassException(
     private val threshold: Int,
     private val inferredUnstableClasses: Int,
     private val possiblePlaces: String,

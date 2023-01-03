@@ -79,14 +79,14 @@ public class VerifyComposeMetrics : Plugin<Project> {
     }
 }
 
-abstract class GenerateComposeMetricsTask @Inject constructor(
+public abstract class GenerateComposeMetricsTask @Inject constructor(
     private val isGeneratingComposeMetrics: Boolean,
     private val inferredUnstableClassThreshold: Int,
     private val errorAsWarning: Boolean,
 ) : DefaultTask() {
 
     @TaskAction
-    fun execute() {
+    internal fun execute() {
 
         if (isGeneratingComposeMetrics) {
             println("Generating Compose Metrics Files")
@@ -157,9 +157,9 @@ abstract class GenerateComposeMetricsTask @Inject constructor(
     }
 }
 
-open class VerifyComposeMetricsConfigImpl {
-    var inferredUnstableClassThreshold: Int? = null
-    var errorAsWarning: Boolean = false
+public open class VerifyComposeMetricsConfigImpl {
+    public var inferredUnstableClassThreshold: Int? = null
+    public var errorAsWarning: Boolean = false
 }
 
 

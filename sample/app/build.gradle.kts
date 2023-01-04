@@ -43,6 +43,8 @@ android {
 VerifyComposeMetricsConfig {
     inferredUnstableClassThreshold = 0
     errorAsWarning = false
+    generateComposeMetricsReport = true
+    //skipVerification = true
 }
 
 dependencies {

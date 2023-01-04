@@ -25,6 +25,8 @@ public class VerifyComposeMetrics : Plugin<Project> {
 
             val errorAsWarning = extension.errorAsWarning
 
+            val printMetricsInfo = extension.printMetricsInfo
+
             // Getting flag from task if we should generate the compose metrics files.
             // The compiler extension is configured to generate these files if this flag is passed.
             val isGeneratingComposeMetrics =
@@ -70,7 +72,8 @@ public class VerifyComposeMetrics : Plugin<Project> {
                 isGeneratingComposeMetrics,
                 inferredUnstableClassThreshold,
                 errorAsWarning,
-                skipVerification
+                skipVerification,
+                printMetricsInfo
             )
             verifyTask.dependsOn(assembleReleaseTask)
         }
@@ -82,14 +85,11 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
     private val inferredUnstableClassThreshold: Int,
     private val errorAsWarning: Boolean,
     private val skipVerification: Boolean,
+    private val printMetricsInfo: Boolean
 ) : DefaultTask() {
 
     @TaskAction
     internal fun execute() {
-
-        if (isGeneratingComposeMetrics) {
-            println("Generating Compose Metrics Files")
-        }
 
         val moduleName = project.name
         val composeMetricsFolder =
@@ -106,6 +106,38 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
         }
 
         val metrics = Json.decodeFromString<Metrics>(releaseModuleJson.readText())
+
+        if (isGeneratingComposeMetrics && printMetricsInfo) {
+            println("Generating Compose Metrics Files")
+            println(
+                """
+                    inferredUnstableClasses = ${metrics.inferredUnstableClasses}
+                    skippableComposables = ${metrics.skippableComposables}
+                    restartableComposables = ${metrics.restartableComposables}
+                    readonlyComposables = ${metrics.readonlyComposables}
+                    totalComposables = ${metrics.totalComposables}
+                    restartGroups = ${metrics.restartGroups}
+                    totalGroups = ${metrics.totalGroups}
+                    staticArguments = ${metrics.staticArguments}
+                    certainArguments = ${metrics.certainArguments}
+                    knownStableArguments = ${metrics.knownStableArguments}
+                    knownUnstableArguments = ${metrics.knownUnstableArguments}
+                    unknownStableArguments = ${metrics.unknownStableArguments}
+                    totalArguments = ${metrics.totalArguments}
+                    markedStableClasses = ${metrics.markedStableClasses}
+                    inferredStableClasses = ${metrics.inferredStableClasses}
+                    inferredUnstableClasses = ${metrics.inferredUnstableClasses}
+                    inferredUncertainClasses = ${metrics.inferredUncertainClasses}
+                    effectivelyStableClasses = ${metrics.effectivelyStableClasses}
+                    totalClasses = ${metrics.totalClasses}
+                    memoizedLambdas = ${metrics.memoizedLambdas}
+                    singletonLambdas = ${metrics.singletonLambdas}
+                    singletonComposableLambdas = ${metrics.singletonComposableLambdas}
+                    composableLambdas = ${metrics.composableLambdas}
+                    totalLambdas = ${metrics.totalLambdas}
+                """.trimIndent()
+            )
+        }
 
         if (!skipVerification) {
             inferredUnstableClassCheck(
@@ -157,6 +189,7 @@ public open class VerifyComposeMetricsConfigImpl {
     public var errorAsWarning: Boolean = false
     public var generateComposeMetricsReport: Boolean = false
     public var skipVerification: Boolean = false
+    public var printMetricsInfo: Boolean = false
 }
 
 

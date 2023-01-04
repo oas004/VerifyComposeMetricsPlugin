@@ -45,6 +45,7 @@ VerifyComposeMetricsConfig {
     errorAsWarning = false
     generateComposeMetricsReport = true
     //skipVerification = true
+    printMetricsInfo = true
 }
 
 dependencies {

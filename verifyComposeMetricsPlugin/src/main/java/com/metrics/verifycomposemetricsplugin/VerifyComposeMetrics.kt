@@ -1,18 +1,26 @@
 package com.metrics.verifycomposemetricsplugin
 
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskAction
+import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.io.File
 import javax.inject.Inject
+import javax.naming.spi.ObjectFactory
 
 public class VerifyComposeMetrics : Plugin<Project> {
 
@@ -20,35 +28,37 @@ public class VerifyComposeMetrics : Plugin<Project> {
         val extension =
             target.extensions.create<VerifyComposeMetricsConfigImpl>("VerifyComposeMetricsConfig")
 
-        target.afterEvaluate {
-            val skipVerification = extension.skipVerification
+        val skipVerification = extension.skipVerification
 
-            val errorAsWarning = extension.errorAsWarning
+        val errorAsWarning = extension.errorAsWarning
 
-            val printMetricsInfo = extension.printMetricsInfo
+        val printMetricsInfo = extension.printMetricsInfo
 
-            // Getting flag from task if we should generate the compose metrics files.
-            // The compiler extension is configured to generate these files if this flag is passed.
-            val isGeneratingComposeMetrics =
-                project.properties.containsKey("generateComposeMetrics") || extension.generateComposeMetricsReport
+        // Getting flag from task if we should generate the compose metrics files.
+        // The compiler extension is configured to generate these files if this flag is passed.
+        val isGeneratingComposeMetrics =
+            target.properties.containsKey("generateComposeMetrics") || extension.generateComposeMetricsReport
 
-            // Depending on this compile release task. We need to do this to generate the metrics report
-            val assembleReleaseTask = tasks.named<KotlinJvmCompile>("compileReleaseKotlin")
-            assembleReleaseTask.configure {
-                if (isGeneratingComposeMetrics) {
-                    kotlinOptions {
-                        freeCompilerArgs = freeCompilerArgs + listOf(
-                            "-P",
-                            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir + "/compose_metrics"
-                        )
-                        freeCompilerArgs = freeCompilerArgs + listOf(
-                            "-P",
-                            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir + "/compose_metrics"
-                        )
-                    }
+        val globalTask = target.tasks.register("verifyComposeMetrics")
+        // Depending on this compile release task. We need to do this to generate the metrics report
+        target.tasks.withType(KotlinJvmCompile::class.java).whenTaskAdded {
+            if (isGeneratingComposeMetrics) {
+                this.kotlinOptions {
+                    freeCompilerArgs = freeCompilerArgs + listOf(
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir + "/compose_metrics"
+                    )
+                    freeCompilerArgs = freeCompilerArgs + listOf(
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir + "/compose_metrics"
+                    )
                 }
             }
-
+        }
+        target.extensions.getByType<ApplicationAndroidComponentsExtension>().beforeVariants {
+            if (!it.enable) {
+                return@beforeVariants
+            }
             // Getting thresholds configured by the user
             // If they want to skip verification they should not need to configure a threshold.
             val inferredUnstableClassThreshold = if (!skipVerification) {
@@ -67,15 +77,19 @@ public class VerifyComposeMetrics : Plugin<Project> {
 
             // Registering our verify task with the configuration passed from the user.
             // We are then adding a dependency for this to the compile kotlin release task.
-            val verifyTask by target.tasks.register<GenerateComposeMetricsTask>(
-                name = "verifyComposeMetrics",
+            val variantTask = target.tasks.register<GenerateComposeMetricsTask>(
+                name = "verify${it.name.capitalized()}ComposeMetrics",
                 isGeneratingComposeMetrics,
                 inferredUnstableClassThreshold,
                 errorAsWarning,
                 skipVerification,
                 printMetricsInfo
             )
-            verifyTask.dependsOn(assembleReleaseTask)
+            variantTask.configure {
+                this.dependsOn(target.tasks.named("compile${it.name.capitalized()}Kotlin"))
+            }
+
+            globalTask.dependsOn(variantTask)
         }
     }
 }
@@ -184,6 +198,7 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
     }
 }
 
+// TODO: Check if I can use Property instead.
 public open class VerifyComposeMetricsConfigImpl {
     public var inferredUnstableClassThreshold: Int? = null
     public var errorAsWarning: Boolean = false

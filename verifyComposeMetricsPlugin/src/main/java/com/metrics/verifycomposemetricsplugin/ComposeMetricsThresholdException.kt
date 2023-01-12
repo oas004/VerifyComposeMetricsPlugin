@@ -8,7 +8,7 @@ import org.gradle.api.GradleException
  * Should be thrown when the compose metrics verification exceeds the set threshold.
  *
  */
-public abstract class ComposeMetricsThresholdException: GradleException()
+public abstract class ComposeMetricsThresholdException : GradleException()
 
 /**
  * InferredUnstableClassException
@@ -17,14 +17,14 @@ public abstract class ComposeMetricsThresholdException: GradleException()
  * the threshold.
  *
  * @property threshold
- * @property inferredUnstableClasses
- * @property possiblePlaces
+ * @property inferredUnstableClasses The classes that are unstable.
+ * @property possiblePlaces The possible places where inferrecUnstableClasses can have been inferred.
  */
 public class InferredUnstableClassException(
     private val threshold: Int,
     private val inferredUnstableClasses: Int,
     private val possiblePlaces: String,
-): ComposeMetricsThresholdException() {
+) : ComposeMetricsThresholdException() {
     override val message: String
         get() = "You have added to many classes that is inferred unstable by the compose compiler." +
                 " \nYou can either make the classes stable or increase your threshold " +

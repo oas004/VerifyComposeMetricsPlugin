@@ -7,20 +7,14 @@ import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskAction
 import org.gradle.configurationcache.extensions.capitalized
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.io.File
 import javax.inject.Inject
-import javax.naming.spi.ObjectFactory
 
 public class VerifyComposeMetrics : Plugin<Project> {
 
@@ -63,13 +57,9 @@ public class VerifyComposeMetrics : Plugin<Project> {
             // If they want to skip verification they should not need to configure a threshold.
             val inferredUnstableClassThreshold = if (!skipVerification) {
                 try {
-                    extension.inferredUnstableClassThreshold ?: error(
-                        "InferredUnstableClassThreshold is not set. " + "Please add this in your gradle file"
-                    )
+                    extension.inferredUnstableClassThreshold ?: error("Missing inferredUnstableThreshold")
                 } catch (e: Exception) {
-                    error(
-                        "We are not able to get the inferredUnstableClassThreshold config. Have you added this to your gradle file? If you just want to generate the metrics report you can add the skipVerification flag instead."
-                    )
+                    throw MissingInferredUnstableClassFieldException()
                 }
             } else {
                 0

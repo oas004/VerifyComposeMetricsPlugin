@@ -6,13 +6,9 @@ plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
     kotlin("plugin.serialization") version "1.7.20"
-    `maven-publish`
     `java-library`
-    signing
+    id("com.gradle.plugin-publish") version "1.0.0"
 }
-
-group = "com.metrics.verify.compose.metrics"
-version = "1.0"
 
 repositories {
     mavenCentral()
@@ -40,11 +36,20 @@ project.tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
-gradlePlugin {
-    plugins {
-        plugins.create("verify-compose-metrics") {
-            id = "com.metrics.verify.compose.metrics"
-            implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
+pluginBundle {
+    website = "https://github.com/oas004/VerifyComposeMetricsPlugin"
+    vcsUrl = "https://github.com/oas004/VerifyComposeMetricsPlugin.git"
+    tags = listOf("android", "compose", "metrics")
+
+    gradlePlugin {
+        plugins {
+            create("verify-compose-metrics") {
+                version = "0.1.0"
+                id = "io.github.oas004.metrics"
+                displayName = "Verify Compose Metrics"
+                description = "Small plugin to verify thresholds from the Compose metrics report."
+                implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
+            }
         }
     }
 }

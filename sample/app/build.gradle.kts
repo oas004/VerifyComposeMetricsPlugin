@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.metrics.verify.compose.metrics") version "1.0-SNAPSHOT"
+    id("io.github.oas004.metrics") version "0.1.0-SNAPSHOT"
 }
 
 android {

@@ -9,9 +9,12 @@ Add plugin to plugins block
 
 ```kt
 plugins {
-    id("com.metrics.verify.compose.metrics") version "1.0-SNAPSHOT"
+    id("io.github.oas004.metrics") version "latest-version"
 }
 ```
+Adding this to your gradle file will add the gradle task `verifyComposeMetrics` to your task list. Running this task
+will run the plugin for all your different flavours. If you for instance only would like to run it for the debug build you can run `./gradlew verifyDebugComposeMetrics`
+
 Use the VerifyComposeMetricsConfig to configure the plugin.
 
 ```kt

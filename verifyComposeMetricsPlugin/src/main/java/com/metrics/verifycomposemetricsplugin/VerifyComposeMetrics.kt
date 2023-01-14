@@ -205,6 +205,7 @@ internal class InferredUnstableClassChecker {
 public interface VerifyComposeMetricsConfig {
     public val inferredUnstableClassThreshold: Property<Int>
     public val errorAsWarning: Property<Boolean>
+    // TODO: Check if we should remove this flag as this is picked up by the property
     public val shouldSkipMetricsGeneration: Property<Boolean>
     public val skipVerification: Property<Boolean>
     public val printMetricsInfo: Property<Boolean>

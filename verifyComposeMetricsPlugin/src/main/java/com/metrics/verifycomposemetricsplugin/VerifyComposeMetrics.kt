@@ -2,41 +2,40 @@ package com.metrics.verifycomposemetricsplugin
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapper
+import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapperImpl
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.configurationcache.extensions.capitalized
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-import java.io.File
-import javax.inject.Inject
 
 public class VerifyComposeMetrics : Plugin<Project> {
 
     override fun apply(target: Project) {
-        val extension =
-            target.extensions.create<VerifyComposeMetricsConfigImpl>("VerifyComposeMetricsConfig")
-
-        val skipVerification = extension.skipVerification
-
-        val errorAsWarning = extension.errorAsWarning
-
-        val printMetricsInfo = extension.printMetricsInfo
+        // Getting the extensions from the gradle file
+        val extension = target.extensions.create(
+            "verifyComposeMetricsConfig",
+            VerifyComposeMetricsConfig::class.java
+        )
 
         // Getting flag from task if we should generate the compose metrics files.
         // The compiler extension is configured to generate these files if this flag is passed.
-        val isGeneratingComposeMetrics =
-            target.properties.containsKey("generateComposeMetrics") || extension.generateComposeMetricsReport
+        val shouldSkipMetricsGeneration = target.properties.containsKey("skipMetricsGeneration")
 
         val globalTask = target.tasks.register("verifyComposeMetrics")
-        // Depending on this compile release task. We need to do this to generate the metrics report
+        // Depending on this task. We need to do this to generate the metrics report
         target.tasks.withType(KotlinJvmCompile::class.java).whenTaskAdded {
-            if (isGeneratingComposeMetrics) {
+            // By default we are generating the metrics report, but passing in
+            // the flag above can bypass this.
+            if (!shouldSkipMetricsGeneration) {
                 this.kotlinOptions {
                     freeCompilerArgs = freeCompilerArgs + listOf(
                         "-P",
@@ -53,28 +52,19 @@ public class VerifyComposeMetrics : Plugin<Project> {
             if (!it.enable) {
                 return@beforeVariants
             }
-            // Getting thresholds configured by the user
-            // If they want to skip verification they should not need to configure a threshold.
-            val inferredUnstableClassThreshold = if (!skipVerification) {
-                try {
-                    extension.inferredUnstableClassThreshold ?: error("Missing inferredUnstableThreshold")
-                } catch (e: Exception) {
-                    throw MissingInferredUnstableClassFieldException()
-                }
-            } else {
-                0
-            }
 
             // Registering our verify task with the configuration passed from the user.
             // We are then adding a dependency for this to the compile kotlin release task.
             val variantTask = target.tasks.register<GenerateComposeMetricsTask>(
                 name = "verify${it.name.capitalized()}ComposeMetrics",
-                isGeneratingComposeMetrics,
-                inferredUnstableClassThreshold,
-                errorAsWarning,
-                skipVerification,
-                printMetricsInfo
-            )
+            ) {
+                this.errorAsWarning.set(extension.errorAsWarning)
+                this.inferredUnstableClassThreshold.set(extension.inferredUnstableClassThreshold)
+                this.printMetricsInfo.set(extension.printMetricsInfo)
+                this.skipVerification.set(extension.skipVerification)
+                this.variant.set(it.name)
+                this.shouldSkipMetricsGeneration.set(shouldSkipMetricsGeneration)
+            }
             variantTask.configure {
                 this.dependsOn(target.tasks.named("compile${it.name.capitalized()}Kotlin"))
             }
@@ -84,13 +74,25 @@ public class VerifyComposeMetrics : Plugin<Project> {
     }
 }
 
-public abstract class GenerateComposeMetricsTask @Inject constructor(
-    private val isGeneratingComposeMetrics: Boolean,
-    private val inferredUnstableClassThreshold: Int,
-    private val errorAsWarning: Boolean,
-    private val skipVerification: Boolean,
-    private val printMetricsInfo: Boolean
-) : DefaultTask() {
+public abstract class GenerateComposeMetricsTask : DefaultTask() {
+
+    @get:Input
+    public abstract val skipVerification: Property<Boolean>
+
+    @get:Input
+    public abstract val inferredUnstableClassThreshold: Property<Int>
+
+    @get:Input
+    public abstract val errorAsWarning: Property<Boolean>
+
+    @get:Input
+    public abstract val printMetricsInfo: Property<Boolean>
+
+    @get:Input
+    public abstract val variant: Property<String>
+
+    @get:Input
+    public abstract val shouldSkipMetricsGeneration: Property<Boolean>
 
     @TaskAction
     internal fun execute() {
@@ -99,11 +101,14 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
         val composeMetricsFolder =
             project.buildDir.listFiles()?.find { it.name == "compose_metrics" }
                 ?: throw MissingComposeMetricsException()
-        val releaseModuleJson = composeMetricsFolder.listFiles()
-            ?.find { it.name == "${moduleName}_release-module.json" }
 
+        // TODO: Check if this file path will be correct for debug builds and make test
+        val releaseModuleJson = composeMetricsFolder.listFiles()
+            ?.find { it.name == "${moduleName}_${variant.get()}-module.json" }
+
+        // TODO: Check if this file path will be correct for debug builds and make test
         val releaseClassesTxt = composeMetricsFolder.listFiles()
-            ?.find { it.name == "${moduleName}_release-classes.txt" }
+            ?.find { it.name == "${moduleName}_${variant.get()}-classes.txt" }
 
         if (releaseModuleJson == null || releaseClassesTxt == null) {
             throw MissingComposeMetricsException()
@@ -111,7 +116,7 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
 
         val metrics = Json.decodeFromString<Metrics>(releaseModuleJson.readText())
 
-        if (isGeneratingComposeMetrics && printMetricsInfo) {
+        if (!shouldSkipMetricsGeneration.get() && printMetricsInfo.get()) {
             println("Generating Compose Metrics Files")
             println(
                 """
@@ -143,17 +148,21 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
             )
         }
 
-        if (!skipVerification) {
-            inferredUnstableClassCheck(
-                inferredUnstableClassThreshold = inferredUnstableClassThreshold,
+        val releaseClassesFile = FileWrapperImpl(releaseClassesTxt.path)
+
+        if (!skipVerification.get()) {
+            val status = InferredUnstableClassChecker().inferredUnstableClassCheck(
+                inferredUnstableClassThreshold = inferredUnstableClassThreshold.get(),
                 inferredUnstableClasses = metrics.inferredUnstableClasses,
-                classesFile = releaseClassesTxt,
-                errorAsWarning = errorAsWarning,
+                classesFile = releaseClassesFile,
+                errorAsWarning = errorAsWarning.get(),
             )
+            if (status != null) println(status)
         }
-
     }
+}
 
+internal class InferredUnstableClassChecker {
     /**
      * Checks if the generated inferred unstable classes is above the threshold. If it is, it
      * @throws IllegalStateException and provides possible classes that has this property.
@@ -161,13 +170,17 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
      * @param inferredUnstableClassThreshold
      * @param inferredUnstableClasses
      *
+     * @throws InferredUnstableClassException
+     * @throws NoSuchFileException
+     *
+     * returns status from the check
      */
-    private fun inferredUnstableClassCheck(
+    internal fun inferredUnstableClassCheck(
         inferredUnstableClassThreshold: Int,
         inferredUnstableClasses: Int,
-        classesFile: File,
+        classesFile: FileWrapper,
         errorAsWarning: Boolean,
-    ) {
+    ): String? {
         if (inferredUnstableClassThreshold < inferredUnstableClasses) {
             println(pluginTitle())
 
@@ -180,21 +193,21 @@ public abstract class GenerateComposeMetricsTask @Inject constructor(
                 possiblePlaces = possiblePlaces.joinToString(),
             )
             if (errorAsWarning) {
-                println("WARNING: ${exception.message}")
+                return "WARNING: ${exception.message}"
             } else {
                 throw exception
             }
         }
+        return null
     }
 }
 
-// TODO: Check if I can use Property instead.
-public open class VerifyComposeMetricsConfigImpl {
-    public var inferredUnstableClassThreshold: Int? = null
-    public var errorAsWarning: Boolean = false
-    public var generateComposeMetricsReport: Boolean = false
-    public var skipVerification: Boolean = false
-    public var printMetricsInfo: Boolean = false
+public interface VerifyComposeMetricsConfig {
+    public val inferredUnstableClassThreshold: Property<Int>
+    public val errorAsWarning: Property<Boolean>
+    public val shouldSkipMetricsGeneration: Property<Boolean>
+    public val skipVerification: Property<Boolean>
+    public val printMetricsInfo: Property<Boolean>
 }
 
 

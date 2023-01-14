@@ -39,13 +39,12 @@ android {
         jvmTarget = "1.8"
     }
 }
-
-VerifyComposeMetricsConfig {
-    inferredUnstableClassThreshold = 0
-    errorAsWarning = false
-    generateComposeMetricsReport = true
-    //skipVerification = true
-    printMetricsInfo = true
+verifyComposeMetricsConfig {
+    inferredUnstableClassThreshold.set(0)
+    errorAsWarning.set(false)
+    shouldSkipMetricsGeneration.set(false)
+    skipVerification.set(true)
+    printMetricsInfo.set(true)
 }
 
 dependencies {

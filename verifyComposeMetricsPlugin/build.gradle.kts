@@ -21,18 +21,37 @@ java {
     withSourcesJar()
 }
 
+val integrationTest: SourceSet by sourceSets.creating
+val functionalTest: SourceSet by sourceSets.creating
+
 dependencies {
     implementation(kotlin("stdlib", "1.7.20"))
     compileOnly("com.android.tools.build:gradle:7.3.1+")
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+
+    // Test dependencies
+    testImplementation("junit:junit:4.4")
+    testImplementation("io.mockk:mockk:1.13.3")
+
+    // Integration test dependency
+    "integrationTestImplementation"(project)
+    "integrationTestImplementation"("org.junit.jupiter:junit-jupiter:5.7.1")
+    "integrationTestImplementation"(kotlin("script-runtime"))
+
+    // Functional test dependency
+    "functionalTestImplementation"(project)
+    "functionalTestImplementation"("org.junit.jupiter:junit-jupiter:5.7.1")
+    "functionalTestImplementation"(kotlin("script-runtime"))
 }
 
 project.tasks.withType<KotlinCompile>().configureEach {
     // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
-    this.kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-Xexplicit-api=strict"
+    if (!this.name.endsWith("TestKotlin")) {
+        this.kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + "-Xexplicit-api=strict"
+        }
     }
 }
 
@@ -49,7 +68,36 @@ pluginBundle {
                 displayName = "Verify Compose Metrics"
                 description = "Small plugin to verify thresholds from the Compose metrics report."
                 implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
+                testSourceSets(functionalTest)
             }
         }
     }
+}
+
+// Running integration tests
+val integrationTestTask = tasks.register<Test>("integrationTest") {
+    description = "Runs the integration tests."
+    group = "verification"
+    testClassesDirs = integrationTest.output.classesDirs
+    classpath = integrationTest.runtimeClasspath
+    mustRunAfter(tasks.test)
+}
+
+// Running integration tests
+val functionalTestTask = tasks.register<Test>("functionalTest") {
+    description = "Runs the functional tests."
+    group = "verification"
+    testClassesDirs = functionalTest.output.classesDirs
+    classpath = functionalTest.runtimeClasspath
+    mustRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(integrationTestTask)
+    dependsOn(functionalTestTask)
+}
+
+tasks.withType<Test>().configureEach {
+    // Using JUnitPlatform for running tests
+    useJUnitPlatform()
 }

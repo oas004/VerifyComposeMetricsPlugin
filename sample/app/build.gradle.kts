@@ -43,7 +43,7 @@ verifyComposeMetricsConfig {
     inferredUnstableClassThreshold.set(0)
     errorAsWarning.set(false)
     shouldSkipMetricsGeneration.set(false)
-    skipVerification.set(true)
+    skipVerification.set(false)
     printMetricsInfo.set(true)
 }
 
@@ -58,6 +58,8 @@ dependencies {
     implementation("androidx.compose.material:material")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
+
+    implementation("androidx.activity:activity-compose:1.7.0-alpha03")
 
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("androidx.appcompat:appcompat:1.5.1")

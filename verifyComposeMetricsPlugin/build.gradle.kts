@@ -26,24 +26,29 @@ val functionalTest: SourceSet by sourceSets.creating
 
 dependencies {
     implementation(kotlin("stdlib", "1.7.20"))
-    compileOnly("com.android.tools.build:gradle:7.3.1+")
+    implementation("com.android.tools.build:gradle:7.3.1+")
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
 
     // Test dependencies
-    testImplementation("junit:junit:4.4")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.3")
 
     // Integration test dependency
     "integrationTestImplementation"(project)
-    "integrationTestImplementation"("org.junit.jupiter:junit-jupiter:5.7.1")
+    "integrationTestImplementation"("org.junit.jupiter:junit-jupiter:5.8.2")
+    "integrationTestImplementation"(gradleTestKit())
     "integrationTestImplementation"(kotlin("script-runtime"))
 
     // Functional test dependency
     "functionalTestImplementation"(project)
-    "functionalTestImplementation"("org.junit.jupiter:junit-jupiter:5.7.1")
+    "functionalTestImplementation"("org.junit.jupiter:junit-jupiter:5.8.2")
+    "functionalTestImplementation"("org.jetbrains.kotlin:kotlin-test")
+    "functionalTestImplementation"(gradleTestKit())
     "functionalTestImplementation"(kotlin("script-runtime"))
+    "functionalTestImplementation"("com.android.tools.build:gradle:7.3.1")
 }
 
 project.tasks.withType<KotlinCompile>().configureEach {

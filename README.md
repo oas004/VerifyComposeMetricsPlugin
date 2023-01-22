@@ -64,7 +64,7 @@ data class UnstableClass(
 
 This is because the class parameter is a var.
 
-If you want to read more about `@Stable` classes and performance i would recommend [this](https://medium.com/androiddevelopers/jetpack-compose-stability-explained-79c10db270c8) blogpost.
+If you want to read more about `@Stable` classes and performance I would recommend [this](https://medium.com/androiddevelopers/jetpack-compose-stability-explained-79c10db270c8) blogpost.
 
 If you want to limit the amount of inferred unstable classes, you can configure the `VerifyComposeMetricsConfig` with a `inferredUnstableClassThreshold`.
 This will make the `./gradlew verifyComposeMetrics` task fail if the module has crossed the threshold. If you just want it to print a warning, you can 

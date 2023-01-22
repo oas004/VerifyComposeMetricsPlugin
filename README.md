@@ -1,7 +1,25 @@
+# IMPORTANT
+This project is currently very experimental and is not yet meant to be used in production by anyone.
+
 # VerifyComposeMetricsPlugin
+
 This is a small plugin that generates the compose metrics and checks that you have not crossed the threshold that you have set.
+The point of this plugin is to help apps that might suffer from performance issues due to inferred unstable objects being passed through 
+Composable functions. It can also help to get an overview of all metrics related to Compose in your app. Furthermore, the point here is to set
+a baseline for the current state of the project and run the gradle command on CI. This way you can gain control over all the code submitted that 
+might cause performance issues down the line.
+
+This library is meant to be used in UI modules.
+
+If you have not seen any performance issues in your app, you might not have to think about this at all.
 
 The Compose Metrics report is generated from the [Compiler report](https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/design/compiler-metrics.md)
+
+## Requirements
+
+ - Compose Compiler version 1.2.0+
+ - Compose enabled
+ - AGP Version 7.3.1+
 
 ## Implementation
 

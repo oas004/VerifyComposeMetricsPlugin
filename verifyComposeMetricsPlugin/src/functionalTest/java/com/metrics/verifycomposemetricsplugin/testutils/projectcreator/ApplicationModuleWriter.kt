@@ -28,11 +28,17 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
     ) {
         gradleFile.writeSrcApplicationModule(
             composeEnabled = applicationModuleData.composeEnabled,
-            inferredUnstableClassThreshold = applicationModuleData.verifyComposeMetricsConfig.inferredUnstableClassThreshold,
-            errorAsWarning = applicationModuleData.verifyComposeMetricsConfig.errorAsWarning,
-            shouldSkipMetricsGeneration = applicationModuleData.verifyComposeMetricsConfig.shouldSkipMetricsGeneration,
-            skipVerification = applicationModuleData.verifyComposeMetricsConfig.skipVerification,
-            printMetricsInfo = applicationModuleData.verifyComposeMetricsConfig.printMetricsInfo,
+            inferredUnstableClassThreshold = applicationModuleData.verifyComposeMetricsConfig?.inferredUnstableClassThreshold
+                ?: 0,
+            errorAsWarning = applicationModuleData.verifyComposeMetricsConfig?.errorAsWarning
+                ?: false,
+            shouldSkipMetricsGeneration = applicationModuleData.verifyComposeMetricsConfig?.shouldSkipMetricsGeneration
+                ?: false,
+            skipVerification = applicationModuleData.verifyComposeMetricsConfig?.skipVerification
+                ?: false,
+            printMetricsInfo = applicationModuleData.verifyComposeMetricsConfig?.printMetricsInfo
+                ?: false,
+            pluginEnabled = applicationModuleData.verifyComposeMetricsConfig != null
         )
         manifestFile.writeToManifestFile()
         mainActivity.writeToMainActivityFile(applicationModuleData.composableContent)
@@ -72,7 +78,7 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
                     .map { classInvoked("StableClass_$it") }
 
                 val unstableClassNames = (1 until it.unstableClassesAmount + 1)
-                        .map { classInvoked("UnstableClass_$it") }
+                    .map { classInvoked("UnstableClass_$it") }
 
                 this.appendText(
                     """
@@ -168,21 +174,25 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
         shouldSkipMetricsGeneration: Boolean,
         skipVerification: Boolean,
         printMetricsInfo: Boolean,
+        pluginEnabled: Boolean
     ) {
         this.writeText(
             """   
             plugins {
                  id("com.android.application")
                  id("org.jetbrains.kotlin.android")
-                 id("io.github.oas004.metrics") version "0.1.0-SNAPSHOT"
+                 ${pluginsBlock(pluginEnabled)} 
             }
             
-            verifyComposeMetricsConfig {
-                inferredUnstableClassThreshold.set($inferredUnstableClassThreshold)
-                errorAsWarning.set($errorAsWarning)
-                shouldSkipMetricsGeneration.set($shouldSkipMetricsGeneration)
-                skipVerification.set($skipVerification)
-                printMetricsInfo.set($printMetricsInfo)
+            ${
+                pluginConfigurationsBlock(
+                    pluginEnabled = pluginEnabled,
+                    inferredUnstableClassThreshold = inferredUnstableClassThreshold,
+                    errorAsWarning = errorAsWarning,
+                    shouldSkipMetricsGeneration = shouldSkipMetricsGeneration,
+                    skipVerification = skipVerification,
+                    printMetricsInfo = printMetricsInfo
+                )
             }
             
             android {
@@ -246,6 +256,35 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
 
     private fun functionInvoked(functionName: String): String {
         return "$functionName()"
+    }
+
+    private fun pluginsBlock(pluginEnabled: Boolean): String {
+        return if (pluginEnabled) {
+            "id(\"io.github.oas004.metrics\") version \"0.1.0-SNAPSHOT\""
+        } else ""
+    }
+
+    private fun pluginConfigurationsBlock(
+        pluginEnabled: Boolean,
+        inferredUnstableClassThreshold: Int,
+        errorAsWarning: Boolean,
+        shouldSkipMetricsGeneration: Boolean,
+        skipVerification: Boolean,
+        printMetricsInfo: Boolean,
+    ): String {
+        return if (pluginEnabled) {
+            """
+                verifyComposeMetricsConfig {
+                inferredUnstableClassThreshold.set($inferredUnstableClassThreshold)
+                errorAsWarning.set($errorAsWarning)
+                shouldSkipMetricsGeneration.set($shouldSkipMetricsGeneration)
+                skipVerification.set($skipVerification)
+                printMetricsInfo.set($printMetricsInfo)
+            }
+            """.trimIndent()
+        } else {
+            ""
+        }
     }
 
     private fun classInvoked(className: String): String {

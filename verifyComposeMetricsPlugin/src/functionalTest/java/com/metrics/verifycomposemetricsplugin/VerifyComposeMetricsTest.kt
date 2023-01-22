@@ -223,4 +223,58 @@ class VerifyComposeMetricsTest {
         assert(result.output.contains(expectedWarning))
     }
 
+    @Test
+    fun `GIVEN libraryModule implementation THEN gradle task SHOULD run`() {
+        val config = VerifyComposeMetricsConfigImpl(
+            inferredUnstableClassThreshold = 3,
+            errorAsWarning = true,
+            shouldSkipMetricsGeneration = false,
+            skipVerification = false,
+            printMetricsInfo = false
+        )
+        val applicationModuleData = ApplicationModuleData(
+            composeEnabled = false,
+            verifyComposeMetricsConfig = null,
+            composableContent = listOf()
+        )
+        val composableContent = ComposableContent(
+            composableName = "TestScreen",
+            unstableClassesAmount = 4,
+            stableClassesAmount = 0,
+        )
+        val libraryModuleData = LibraryModuleData(
+            name = "lib",
+            composeEnabled = true,
+            verifyComposeMetricsConfig = config,
+            composableContent = listOf(composableContent),
+        )
+
+        val projectCreator = TestProjectCreatorImpl().createTempApplicationProject(
+            applicationModuleData = applicationModuleData,
+            libraryModuleData = libraryModuleData,
+        )
+
+        val result = ComposeMetricsGradleRunner()
+            .runner
+            .withProjectDir(projectCreator.tempDir)
+            .withArguments(":lib:verifyComposeMetrics")
+            .withPluginClasspath()
+            .forwardOutput()
+            .build()
+
+        assertEquals(TaskOutcome.SUCCESS, result.task(":lib:verifyComposeMetrics")?.outcome)
+
+        val expectedWarning = """
+            WARNING: You have added to many classes that is inferred unstable by the compose compiler. 
+            You can either make the classes stable or increase your threshold in your gradle file 
+            Using inferredUnstableClasses in Compose code can lead to performance issues. The current threshold is : 3 
+            There is currently 4 inferredUnstableClasses in this module 
+            The possible classes that has inferred unstable types are
+             class UnstableClass_1 ,  class UnstableClass_2 ,  class UnstableClass_3 ,  class UnstableClass_4 
+        """.trimIndent()
+
+        // Check that it contains a warning
+        assert(result.output.contains(expectedWarning))
+    }
+
 }

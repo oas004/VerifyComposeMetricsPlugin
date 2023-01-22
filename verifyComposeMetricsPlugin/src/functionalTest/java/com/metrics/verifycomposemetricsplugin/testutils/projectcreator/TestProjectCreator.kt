@@ -1,12 +1,9 @@
 package com.metrics.verifycomposemetricsplugin
 
-import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.ApplicationModuleWriter
 import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.ApplicationModuleWriterImpl
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.LibraryModuleWriterImpl
 import java.io.File
 import java.nio.file.Files
-import kotlin.reflect.KClass
-import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaClass
-import kotlin.reflect.jvm.internal.impl.load.kotlin.KotlinClassFinder.Result.KotlinClass
 
 internal class VerifyComposeMetricsConfigImpl(
     val inferredUnstableClassThreshold: Int,
@@ -18,9 +15,11 @@ internal class VerifyComposeMetricsConfigImpl(
 
 // If the composable content is null, there will not be rendered any
 // compose code in the module.
+// Config being null means that we do not apply the plugin for the module as that is required
+// for the plugin to work.
 internal data class ApplicationModuleData(
     val composeEnabled: Boolean,
-    val verifyComposeMetricsConfig: VerifyComposeMetricsConfigImpl,
+    val verifyComposeMetricsConfig: VerifyComposeMetricsConfigImpl?,
     val composableContent: List<ComposableContent>?,
 )
 
@@ -31,8 +30,10 @@ internal data class ComposableContent(
 )
 
 internal data class LibraryModuleData(
+    val name: String,
     val composeEnabled: Boolean,
-    val verifyComposeMetricsConfig: VerifyComposeMetricsConfigImpl,
+    val verifyComposeMetricsConfig: VerifyComposeMetricsConfigImpl?,
+    val composableContent: List<ComposableContent>?,
 )
 
 internal interface TestProjectCreator {
@@ -108,11 +109,49 @@ internal class TestProjectCreatorImpl : TestProjectCreator {
             )
         }
 
+        if (libraryModuleData != null) {
+            val libraryDir = File(tempDir, libraryModuleData.name)
+            val libBuildDir = File(libraryDir, "build")
+            val libSrcDir = File(libraryDir, "src")
+            val libMainDIr = File(libSrcDir, "main")
+            val libJavaDir = File(libMainDIr, "java")
+            val libComDir = File(libJavaDir, "com")
+            val libMetricsDir = File(libComDir, "metrics")
+            val libPackageDir = File(libMetricsDir, libraryModuleData.name)
+
+            if (
+                !libraryDir.mkdir() ||
+                !libBuildDir.mkdir() ||
+                !libSrcDir.mkdir() ||
+                !libMainDIr.mkdir() ||
+                !libJavaDir.mkdir() ||
+                !libComDir.mkdir() ||
+                !libMetricsDir.mkdir() ||
+                !libPackageDir.mkdir()
+            ) {
+                throw IllegalStateException("IO Failure on making ${libraryModuleData.name}")
+            }
+
+            val libBuildFile = File(tempDir, "${libraryModuleData.name}/build.gradle.kts")
+            libBuildFile.createNewFile()
+
+            val libScreenFile = File(libPackageDir, "Screen.kt")
+            libScreenFile.createNewFile()
+
+            LibraryModuleWriterImpl().apply {
+                writeLibraryModule(
+                    gradleFile = libBuildFile,
+                    screenFile = libScreenFile,
+                    libraryModuleData = libraryModuleData,
+                )
+            }
+        }
+
         gradleProperties.writeGradlePropertiesFile()
 
         projectFile.writeToProjectGradleFile()
 
-        settingsFile.writeToSettingsGradleFile()
+        settingsFile.writeToSettingsGradleFile(libraryModuleData)
 
 
         return FileStructure(
@@ -136,10 +175,16 @@ internal class TestProjectCreatorImpl : TestProjectCreator {
         )
     }
 
-    private fun File.writeToSettingsGradleFile() {
+    private fun File.writeToSettingsGradleFile(libraryModuleData: LibraryModuleData?) {
+        val libraryInclude = if (libraryModuleData != null) {
+            "include ':${libraryModuleData.name}'"
+        } else {
+            ""
+        }
         this.writeText(
             """
                     include ':app'
+                    $libraryInclude
                     rootProject.name = "verifyComposeMetrics"
                 """.trimIndent()
         )

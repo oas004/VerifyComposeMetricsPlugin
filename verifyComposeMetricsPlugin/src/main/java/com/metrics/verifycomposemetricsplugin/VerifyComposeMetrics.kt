@@ -1,6 +1,7 @@
 package com.metrics.verifycomposemetricsplugin
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapper
 import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapperImpl
@@ -10,11 +11,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Incubating
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.configurationcache.extensions.capitalized
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -49,30 +52,58 @@ public class VerifyComposeMetrics : Plugin<Project> {
                 }
             }
         }
-        // TODO: Check if this applies to LibraryAndroidComponentsExtension as well.
-        target.extensions.getByType<ApplicationAndroidComponentsExtension>().beforeVariants {
-            if (!it.enable) {
-                return@beforeVariants
-            }
-
-            // Registering our verify task with the configuration passed from the user.
-            // We are then adding a dependency for this to the compile kotlin release task.
-            val variantTask = target.tasks.register<GenerateComposeMetricsTask>(
-                name = "verify${it.name.capitalized()}ComposeMetrics",
-            ) {
-                this.errorAsWarning.set(extension.errorAsWarning)
-                this.inferredUnstableClassThreshold.set(extension.inferredUnstableClassThreshold)
-                this.printMetricsInfo.set(extension.printMetricsInfo)
-                this.skipVerification.set(extension.skipVerification)
-                this.variant.set(it.name)
-                this.shouldSkipMetricsGeneration.set(shouldSkipMetricsGeneration)
-            }
-            variantTask.configure {
-                this.dependsOn(target.tasks.named("compile${it.name.capitalized()}Kotlin"))
-            }
-
-            globalTask.dependsOn(variantTask)
+        target.extensions.findByType<LibraryAndroidComponentsExtension>()?.beforeVariants {
+            registerPugin(
+                enable = it.enable,
+                name = it.name,
+                target = target,
+                extension = extension,
+                shouldSkipMetricsGeneration = shouldSkipMetricsGeneration,
+                globalTask = globalTask
+            )
         }
+
+        target.extensions.findByType<ApplicationAndroidComponentsExtension>()?.beforeVariants {
+            registerPugin(
+                enable = it.enable,
+                name = it.name,
+                target = target,
+                extension = extension,
+                shouldSkipMetricsGeneration = shouldSkipMetricsGeneration,
+                globalTask = globalTask
+            )
+        }
+    }
+
+    private fun registerPugin(
+        enable: Boolean,
+        name: String,
+        target: Project,
+        extension: VerifyComposeMetricsConfig,
+        shouldSkipMetricsGeneration: Boolean,
+        globalTask: TaskProvider<Task>
+    ) {
+        if (!enable) {
+            return
+        }
+
+        // Registering our verify task with the configuration passed from the user.
+        // We are then adding a dependency for this to the compile kotlin release task.
+        val variantTask = target.tasks.register<GenerateComposeMetricsTask>(
+            name = "verify${name.capitalized()}ComposeMetrics",
+        ) {
+            this.errorAsWarning.set(extension.errorAsWarning)
+            this.inferredUnstableClassThreshold.set(extension.inferredUnstableClassThreshold)
+            this.printMetricsInfo.set(extension.printMetricsInfo)
+            this.skipVerification.set(extension.skipVerification)
+            this.variant.set(name)
+            this.shouldSkipMetricsGeneration.set(shouldSkipMetricsGeneration)
+        }
+        variantTask.configure {
+            this.dependsOn(target.tasks.named("compile${name.capitalized()}Kotlin"))
+        }
+
+        globalTask.dependsOn(variantTask)
     }
 }
 

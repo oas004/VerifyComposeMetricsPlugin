@@ -13,3 +13,4 @@ pluginManagement {
 }
 rootProject.name = "VerifyComposeMetricsSample"
 include ':app'
+include ':lib'

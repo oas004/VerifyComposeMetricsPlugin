@@ -1,6 +1,8 @@
 # IMPORTANT
 This project is currently very experimental and is not yet meant to be used in production by anyone.
 
+![Build and Test](https://github.com/oas004/VerifyComposeMetricsPlugin/actions/workflows/build.yml/badge.svg)
+
 # VerifyComposeMetricsPlugin
 
 This is a small plugin that generates the compose metrics and checks that you have not crossed the threshold that you have set.

@@ -26,15 +26,16 @@ val functionalTest: SourceSet by sourceSets.creating
 
 dependencies {
     implementation(kotlin("stdlib", "1.7.20"))
-    implementation("com.android.tools.build:gradle:7.3.1+")
+    implementation("com.android.tools.build:gradle:7.3.1+") //TODO: This should be made compileOnly so we do not force agp version on user.
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.3")
+    testImplementation("com.android.tools.build:gradle:7.3.1")
 
     // Integration test dependency
     "integrationTestImplementation"(project)

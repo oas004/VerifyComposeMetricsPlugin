@@ -4,6 +4,8 @@ pluginManagement {
             url = uri("../verifyComposeMetricsPlugin/")
         }
         mavenLocal()
+        mavenCentral()
+        google()
         gradlePluginPortal()
     }
 

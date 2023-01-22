@@ -1,7 +1,6 @@
 package com.metrics.verifycomposemetricsplugin
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapper
 import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapperImpl

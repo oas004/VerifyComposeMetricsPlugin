@@ -1,5 +1,5 @@
 # IMPORTANT
-This project is currently very experimental and is not yet meant to be used in production by anyone.
+This project is currently very experimental and is not yet meant to be used in production by anyone. Furthermore, the plugin publication is pending.
 
 ![Build and Test](https://github.com/oas004/VerifyComposeMetricsPlugin/actions/workflows/build.yml/badge.svg)
 

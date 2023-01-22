@@ -8,6 +8,7 @@ import com.metrics.verifycomposemetricsplugin.fileutils.FileWrapperImpl
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
+import org.gradle.api.Incubating
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
@@ -204,10 +205,10 @@ internal class InferredUnstableClassChecker {
     }
 }
 
+@Incubating
 public interface VerifyComposeMetricsConfig {
     public val inferredUnstableClassThreshold: Property<Int>
     public val errorAsWarning: Property<Boolean>
-    // TODO: Check if we should remove this flag as this is picked up by the property
     public val shouldSkipMetricsGeneration: Property<Boolean>
     public val skipVerification: Property<Boolean>
     public val printMetricsInfo: Property<Boolean>

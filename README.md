@@ -83,12 +83,16 @@ Setting the `printMetricsInfo` to `true` will print a version of the ComposeMetr
 ## Contributing
 Please contribute if you want! Feel free to open an issue if there is anything you want to discuss or anything is off.
 
+## Future work
+Checking inferred unstable classes might not be enough. We kinda want to know the functions that are restartable and not skippable in order to make them skippable.
+I would also like to maybe use the metrics report to provide more guidance on how use this to improve performance.
+
 ## License
 
 ```
 MIT License
 
-Copyright (c) 2022 Odin Asbjørnsen
+Copyright (c) 2023 Odin Asbjørnsen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

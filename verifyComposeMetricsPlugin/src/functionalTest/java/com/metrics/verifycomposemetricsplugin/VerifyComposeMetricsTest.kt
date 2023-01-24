@@ -1,6 +1,11 @@
 package com.metrics.verifycomposemetricsplugin
 
 import com.metrics.verifycomposemetricsplugin.testutils.ComposeMetricsGradleRunner
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.ApplicationModuleData
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.ComposableContent
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.LibraryModuleData
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.TestProjectCreatorImpl
+import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.VerifyComposeMetricsConfigImpl
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

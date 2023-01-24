@@ -1,7 +1,5 @@
 package com.metrics.verifycomposemetricsplugin.testutils.projectcreator
 
-import com.metrics.verifycomposemetricsplugin.ComposableContent
-import com.metrics.verifycomposemetricsplugin.LibraryModuleData
 import java.io.File
 
 internal interface LibraryModuleWriter {
@@ -208,7 +206,7 @@ internal class LibraryModuleWriterImpl : LibraryModuleWriter {
 
     private fun pluginsBlock(pluginEnabled: Boolean): String {
         return if (pluginEnabled) {
-            "id(\"io.github.oas004.metrics\") version \"0.1.0-SNAPSHOT\""
+            "id(\"io.github.oas004.metrics\")"
         } else ""
     }
 

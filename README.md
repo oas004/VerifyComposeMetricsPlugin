@@ -106,7 +106,7 @@ data class UnstableGreetingsClass(
 )
 
 ```
-And then adding a verifyComposeMetrics configuration like this:
+And then adding a verifyComposeMetrics configuration into build.gradle.kts like this:
 
 ```kts
 verifyComposeMetricsConfig {

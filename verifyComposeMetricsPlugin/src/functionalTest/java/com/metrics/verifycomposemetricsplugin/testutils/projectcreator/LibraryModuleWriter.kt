@@ -1,7 +1,5 @@
 package com.metrics.verifycomposemetricsplugin.testutils.projectcreator
 
-import com.metrics.verifycomposemetricsplugin.ComposableContent
-import com.metrics.verifycomposemetricsplugin.LibraryModuleData
 import java.io.File
 
 internal interface LibraryModuleWriter {

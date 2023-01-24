@@ -1,7 +1,5 @@
-package com.metrics.verifycomposemetricsplugin
+package com.metrics.verifycomposemetricsplugin.testutils.projectcreator
 
-import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.ApplicationModuleWriterImpl
-import com.metrics.verifycomposemetricsplugin.testutils.projectcreator.LibraryModuleWriterImpl
 import java.io.File
 import java.nio.file.Files
 

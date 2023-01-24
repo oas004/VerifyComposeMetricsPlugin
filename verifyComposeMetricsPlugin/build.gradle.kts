@@ -69,7 +69,7 @@ pluginBundle {
     gradlePlugin {
         plugins {
             create("verify-compose-metrics") {
-                version = "0.1.0"
+                version = "0.1.1"
                 id = "io.github.oas004.metrics"
                 displayName = "Verify Compose Metrics"
                 description = "Small plugin to verify thresholds from the Compose metrics report."

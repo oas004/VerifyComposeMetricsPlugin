@@ -258,7 +258,7 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
 
     private fun pluginsBlock(pluginEnabled: Boolean): String {
         return if (pluginEnabled) {
-            "id(\"io.github.oas004.metrics\") version \"0.1.0-SNAPSHOT\""
+            "id(\"io.github.oas004.metrics\") version \"0.1.1-SNAPSHOT\""
         } else ""
     }
 

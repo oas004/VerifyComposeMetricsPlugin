@@ -1,5 +1,5 @@
 # IMPORTANT
-This project is currently very experimental and is not yet meant to be used in production by anyone. Furthermore, the plugin publication is pending.
+This project is currently very experimental and is not yet meant to be used in production by anyone.
 
 ![Build and Test](https://github.com/oas004/VerifyComposeMetricsPlugin/actions/workflows/build.yml/badge.svg)
 
@@ -27,11 +27,29 @@ The Compose Metrics report is generated from the [Compiler report](https://githu
 
 Add plugin to plugins block 
 
-```kt
+```kts
 plugins {
     id("io.github.oas004.metrics") version "latest-version"
 }
 ```
+
+If you want to use the legacy plugin application, you can use
+```kts
+buildscript {
+  repositories {
+    maven {
+      url = uri("https://plugins.gradle.org/m2/")
+    }
+  }
+  dependencies {
+    classpath("io.github.oas004.metrics:verifyComposeMetricsPlugin:latest-version")
+  }
+}
+
+apply(plugin = "io.github.oas004.metrics")
+```
+
+
 Adding this to your gradle file will add the gradle task `verifyComposeMetrics` to your task list. Running this task
 will run the plugin for all your different flavours. If you for instance only would like to run it for the debug build you can run `./gradlew verifyDebugComposeMetrics`
 

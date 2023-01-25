@@ -61,6 +61,9 @@ project.tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+version = "0.1.1"
+group = "io.github.oas004.metrics"
+
 pluginBundle {
     website = "https://github.com/oas004/VerifyComposeMetricsPlugin"
     vcsUrl = "https://github.com/oas004/VerifyComposeMetricsPlugin.git"
@@ -69,7 +72,6 @@ pluginBundle {
     gradlePlugin {
         plugins {
             create("verify-compose-metrics") {
-                version = "0.1.1"
                 id = "io.github.oas004.metrics"
                 displayName = "Verify Compose Metrics"
                 description = "Small plugin to verify thresholds from the Compose metrics report."

@@ -53,7 +53,7 @@ public class VerifyComposeMetrics : Plugin<Project> {
             }
         }
         target.extensions.findByType<LibraryAndroidComponentsExtension>()?.beforeVariants {
-            registerPugin(
+            registerPlugin(
                 enable = it.enable,
                 name = it.name,
                 target = target,
@@ -64,7 +64,7 @@ public class VerifyComposeMetrics : Plugin<Project> {
         }
 
         target.extensions.findByType<ApplicationAndroidComponentsExtension>()?.beforeVariants {
-            registerPugin(
+            registerPlugin(
                 enable = it.enable,
                 name = it.name,
                 target = target,
@@ -75,7 +75,7 @@ public class VerifyComposeMetrics : Plugin<Project> {
         }
     }
 
-    private fun registerPugin(
+    private fun registerPlugin(
         enable: Boolean,
         name: String,
         target: Project,
@@ -135,19 +135,17 @@ public abstract class GenerateComposeMetricsTask : DefaultTask() {
             project.buildDir.listFiles()?.find { it.name == "compose_metrics" }
                 ?: throw MissingComposeMetricsException()
 
-        // TODO: Check if this file path will be correct for debug builds and make test
-        val releaseModuleJson = composeMetricsFolder.listFiles()
+        val moduleJson = composeMetricsFolder.listFiles()
             ?.find { it.name == "${moduleName}_${variant.get()}-module.json" }
 
-        // TODO: Check if this file path will be correct for debug builds and make test
-        val releaseClassesTxt = composeMetricsFolder.listFiles()
+        val classesTxt = composeMetricsFolder.listFiles()
             ?.find { it.name == "${moduleName}_${variant.get()}-classes.txt" }
 
-        if (releaseModuleJson == null || releaseClassesTxt == null) {
+        if (moduleJson == null || classesTxt == null) {
             throw MissingComposeMetricsException()
         }
 
-        val metrics = Json.decodeFromString<Metrics>(releaseModuleJson.readText())
+        val metrics = Json.decodeFromString<Metrics>(moduleJson.readText())
 
         if (!shouldSkipMetricsGeneration.get() && printMetricsInfo.get()) {
             println("Generating Compose Metrics Files")
@@ -181,7 +179,7 @@ public abstract class GenerateComposeMetricsTask : DefaultTask() {
             )
         }
 
-        val releaseClassesFile = FileWrapperImpl(releaseClassesTxt.path)
+        val releaseClassesFile = FileWrapperImpl(classesTxt.path)
 
         if (!skipVerification.get()) {
             val status = InferredUnstableClassChecker().inferredUnstableClassCheck(

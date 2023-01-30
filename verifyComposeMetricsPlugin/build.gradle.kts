@@ -2,12 +2,11 @@ import org.gradle.kotlin.dsl.`kotlin-dsl`
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.20"
     `kotlin-dsl`
     `java-gradle-plugin`
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("plugin.serialization") version libs.versions.kotlin.get()
     `java-library`
-    id("com.gradle.plugin-publish") version "1.0.0"
+    id("com.gradle.plugin-publish") version libs.versions.gradle.publish.plugin.get()
 }
 
 repositories {
@@ -25,31 +24,31 @@ val integrationTest: SourceSet by sourceSets.creating
 val functionalTest: SourceSet by sourceSets.creating
 
 dependencies {
-    implementation(kotlin("stdlib", "1.7.20"))
-    implementation("com.android.tools.build:gradle:7.3.1")
+    implementation(kotlin("stdlib", libs.versions.kotlin.get()))
+    implementation(libs.agp.tools)
     implementation(gradleApi())
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+    implementation(libs.kotlin.gradle.plugin.api)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlin.gradle.plugin.stnd)
 
     // Test dependencies
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.3")
-    testImplementation("com.android.tools.build:gradle:7.3.1")
+    testImplementation(libs.junit.stnd)
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit.jupiter)
 
     // Integration test dependency
     "integrationTestImplementation"(project)
-    "integrationTestImplementation"("org.junit.jupiter:junit-jupiter:5.8.2")
+    "integrationTestImplementation"(libs.junit.jupiter)
     "integrationTestImplementation"(gradleTestKit())
     "integrationTestImplementation"(kotlin("script-runtime"))
 
     // Functional test dependency
     "functionalTestImplementation"(project)
-    "functionalTestImplementation"("org.junit.jupiter:junit-jupiter:5.8.2")
-    "functionalTestImplementation"("org.jetbrains.kotlin:kotlin-test")
+    "functionalTestImplementation"(libs.junit.jupiter)
+    "functionalTestImplementation"(libs.kotlin.test)
     "functionalTestImplementation"(gradleTestKit())
     "functionalTestImplementation"(kotlin("script-runtime"))
-    "functionalTestImplementation"("com.android.tools.build:gradle:7.3.1")
+    "functionalTestImplementation"(libs.agp.tools)
 }
 
 project.tasks.withType<KotlinCompile>().configureEach {

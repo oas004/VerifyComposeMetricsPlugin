@@ -1,4 +1,3 @@
 rootProject.name = "VerifyComposeMetrics"
 include ':app'
-//include ':verifyComposeMetricsPlugin'
-includeBuild("verifyComposeMetricsPlugin")
+include("verifyComposeMetricsPlugin")

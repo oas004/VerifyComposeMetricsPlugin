@@ -91,7 +91,7 @@ internal class LibraryModuleWriterImpl : LibraryModuleWriter {
                  }
                 
                  composeOptions {
-                     kotlinCompilerExtensionVersion = "1.3.2"
+                     kotlinCompilerExtensionVersion = "1.4.2"
                  }
                 
                  compileOptions {
@@ -104,7 +104,7 @@ internal class LibraryModuleWriterImpl : LibraryModuleWriter {
             }
             
             dependencies {
-                val composeBom = platform("androidx.compose:compose-bom:2022.10.00")
+                val composeBom = platform("androidx.compose:compose-bom:2023.03.00")
                 implementation(composeBom)
                 androidTestImplementation(composeBom)
             

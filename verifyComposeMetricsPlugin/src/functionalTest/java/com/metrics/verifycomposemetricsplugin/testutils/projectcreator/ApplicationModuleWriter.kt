@@ -217,7 +217,7 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
                  }
                 
                  composeOptions {
-                     kotlinCompilerExtensionVersion = "1.3.2"
+                     kotlinCompilerExtensionVersion = "1.4.2"
                  }
                 
                  compileOptions {
@@ -230,7 +230,7 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
             }
             
             dependencies {
-                val composeBom = platform("androidx.compose:compose-bom:2022.10.00")
+                val composeBom = platform("androidx.compose:compose-bom:2023.03.00")
                 implementation(composeBom)
                 androidTestImplementation(composeBom)
             

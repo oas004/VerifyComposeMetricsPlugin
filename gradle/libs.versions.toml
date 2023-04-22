@@ -2,7 +2,7 @@
 agp = "7.3.1"
 androidx-appcompat = "1.5.1"
 androidx-core = "1.8.0"
-androidx-compose-activity = "1.7.0-alpha03"
+androidx-compose-activity = "1.7.1"
 compose-bom = "2023.03.00"
 compose-compiler = "1.4.2"
 google-material = "1.7.0"

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("io.github.oas004.metrics") version "0.1.2-SNAPSHOT"
+    id("io.github.oas004.metrics") version "0.1.3-SNAPSHOT"
 }
 
 android {

@@ -10,7 +10,7 @@ gradle-publish-plugin = "1.0.0"
 junit-jupiter = "5.9.3"
 junit-stnd = "4.13.2"
 kotlin = "1.8.10"
-kotlinx-serialization = "1.5.0"
+kotlinx-serialization = "1.5.1"
 mockk = "1.13.5"
 
 [libraries]

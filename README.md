@@ -166,6 +166,10 @@ Please contribute if you want! Feel free to open an issue if there is anything y
 Checking inferred unstable classes might not be enough. We kinda want to know the functions that are restartable and not skippable in order to make them skippable.
 I would also like to maybe use the metrics report to provide more guidance on how use this to improve performance.
 
+## Gradle plugin web-site
+You can find the plugin artefact at: https://plugins.gradle.org/plugin/io.github.oas004.metrics
+
+
 ## License
 
 ```

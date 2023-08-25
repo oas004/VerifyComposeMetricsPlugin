@@ -58,7 +58,7 @@ project.tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
-version = "0.1.3"
+version = "0.1.4"
 group = "io.github.oas004.metrics"
 
 

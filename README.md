@@ -21,7 +21,7 @@ The Compose Metrics report is generated from the [Compiler report](https://githu
 
  - Compose Compiler version 1.2.0+
  - Compose enabled
- - AGP Version 7.3.1+
+ - AGP Version 8.1.0+
 
 ## Implementation
 

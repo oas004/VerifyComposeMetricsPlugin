@@ -14,10 +14,8 @@ repositories {
     google()
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    withSourcesJar()
+kotlin {
+    jvmToolchain(17)
 }
 
 val integrationTest: SourceSet by sourceSets.creating
@@ -63,20 +61,18 @@ project.tasks.withType<KotlinCompile>().configureEach {
 version = "0.1.3"
 group = "io.github.oas004.metrics"
 
-pluginBundle {
+
+gradlePlugin {
     website = "https://github.com/oas004/VerifyComposeMetricsPlugin"
     vcsUrl = "https://github.com/oas004/VerifyComposeMetricsPlugin.git"
-    tags = listOf("android", "compose", "metrics")
-
-    gradlePlugin {
-        plugins {
-            create("verify-compose-metrics") {
-                id = "io.github.oas004.metrics"
-                displayName = "Verify Compose Metrics"
-                description = "Small plugin to verify thresholds from the Compose metrics report."
-                implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
-                testSourceSets(functionalTest)
-            }
+    plugins {
+        create("verify-compose-metrics") {
+            id = "io.github.oas004.metrics"
+            displayName = "Verify Compose Metrics"
+            description = "Small plugin to verify thresholds from the Compose metrics report."
+            implementationClass = "com.metrics.verifycomposemetricsplugin.VerifyComposeMetrics"
+            testSourceSets(functionalTest)
+            tags = listOf("android", "compose", "metrics")
         }
     }
 }

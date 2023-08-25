@@ -219,11 +219,11 @@ internal class ApplicationModuleWriterImpl : ApplicationModuleWriter {
                  composeOptions {
                      kotlinCompilerExtensionVersion = "1.4.2"
                  }
-                
-                 compileOptions {
-                     sourceCompatibility = JavaVersion.VERSION_1_8
-                     targetCompatibility = JavaVersion.VERSION_1_8
+                 
+                 kotlin {
+                    jvmToolchain(17)
                  }
+                 
                  kotlinOptions {
                      jvmTarget = "1.8"
                  }

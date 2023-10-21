@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("io.github.oas004.metrics") version "0.1.4"
+    id("io.github.oas004.metrics") version "0.1.5"
 }
 
 android {

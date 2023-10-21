@@ -11,7 +11,7 @@ junit-jupiter = "5.10.0"
 junit-stnd = "4.13.2"
 kotlin = "1.8.10"
 kotlinx-serialization = "1.6.0"
-mockk = "1.13.7"
+mockk = "1.13.8"
 
 [libraries]
 agp-tools = { module = "com.android.tools.build:gradle", version.ref = "agp"}

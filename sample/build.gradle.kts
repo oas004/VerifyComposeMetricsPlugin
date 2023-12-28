@@ -8,7 +8,7 @@ buildscript {
     }
     dependencies {
         classpath(libs.kotlin.gradle.plugin.stnd)
-        classpath("com.android.tools.build:gradle:8.1.4")
+        classpath("com.android.tools.build:gradle:8.2.0")
     }
 }
 

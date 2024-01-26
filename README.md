@@ -175,7 +175,7 @@ You can find the plugin artefact at: https://plugins.gradle.org/plugin/io.github
 ```
 MIT License
 
-Copyright (c) 2023 Odin Asbjørnsen
+Copyright (c) 2024 Odin Asbjørnsen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

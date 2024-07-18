@@ -1,3 +1,9 @@
+# Public Archive
+
+Making this as a public archive. It was a very cool project and I learned a lot from it. However, I don't have time to maintain it and give it the love it deserves.^
+
+If you really want it back, please consider sending me a message or forking it.
+
 # IMPORTANT
 This project is currently experimental and the APIs might change in the future. These APIs are marked with the `@Incubating` annotation to indicate this.
 
